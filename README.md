@@ -1,6 +1,9 @@
 # Firebase Cloud Messaging (FCM) Rust Service
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A professional Rust library for sending Firebase Cloud Messaging (FCM) notifications with ease and efficiency.
@@ -22,16 +25,11 @@ A professional Rust library for sending Firebase Cloud Messaging (FCM) notificat
 
 To use `fcm-service`, add the following to your `Cargo.toml`:
 
-```toml
-[dependencies]
-fcm-service = "0.2.3"
-```
-
-Alternatively, if using GitHub as the source:
+Current release: v0.2.3
 
 ```toml
 [dependencies]
-fcm-service = { git = "https://github.com/real-ali/fcm-service" }
+fcm-service = { git = "https://github.com/tralahm/fcm-service", tag = "v0.2.3" }
 ```
 
 ## Usage
@@ -39,22 +37,22 @@ fcm-service = { git = "https://github.com/real-ali/fcm-service" }
 Here’s a quick example demonstrating how to send an FCM notification:
 
 ```rust
-use fcm_service::{FcmService, FcmMessage, FcmNotification, Target};
+use fcm_service::{FcmMessage, FcmNotification, FcmService, Target};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let service = FcmService::new("path/to/service-account.json");
+  let service = FcmService::new("path/to/service-account.json");
 
-    let mut message = FcmMessage::new();
-    let mut notification = FcmNotification::new();
-    notification.set_title("Hello".to_string());
-    notification.set_body("World".to_string());
-    notification.set_image(None);
-    message.set_notification(Some(notification));
-    message.set_target(Target::Token("device-token".to_string()));
+  let mut message = FcmMessage::new();
+  let mut notification = FcmNotification::new();
+  notification.set_title("Hello".to_string());
+  notification.set_body("World".to_string());
+  notification.set_image(None);
+  message.set_notification(Some(notification));
+  message.set_target(Target::Token("device-token".to_string()));
 
-    service.send_notification(message).await?;
-    Ok(())
+  service.send_notification(message).await?;
+  Ok(())
 }
 ```
 
@@ -75,16 +73,17 @@ cargo test
 ```rust
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::fs::File;
-    use std::io::Write;
-    use tempfile;
+  use std::{fs::File, io::Write};
 
-    #[test]
-    fn test_new_service() {
-        let service = FcmService::new("dummy.json");
-        assert_eq!(service.credential_file, "dummy.json");
-    }
+  use tempfile;
+
+  use super::*;
+
+  #[test]
+  fn test_new_service() {
+    let service = FcmService::new("dummy.json");
+    assert_eq!(service.credential_file, "dummy.json");
+  }
 }
 ```
 
@@ -97,8 +96,8 @@ version = "0.1.0"
 edition = "2021"
 description = "A Rust library for sending Firebase Cloud Messaging (FCM) notifications"
 license = "MIT"
-repository = "https://github.com/real-ali/fcm-service"
-documentation = "https://docs.rs/fcm-service"
+repository = "https://github.com/tralahm/fcm-service"
+documentation = "https://tralahm.github.io/fcm-service"
 keywords = ["fcm", "firebase", "notifications", "push"]
 categories = ["api-bindings", "network-programming"]
 ```
@@ -107,7 +106,15 @@ categories = ["api-bindings", "network-programming"]
 
 ```toml
 [dependencies]
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12", default-features = false, features = [
+  "json",
+  "rustls-tls-webpki-roots",
+  "charset",
+  "zstd",
+  "http2",
+  "system-proxy",
+] }
+
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["macros"] }
@@ -126,6 +133,7 @@ Designed & Developed by **Sayed Ali Sina Hussaini**
 
 - Twitter: [real_alisina](https://twitter.com/real_alisina)
 - GitHub: [real-ali](https://github.com/real-ali)
+- GitHub: [TralahM](https://github.com/tralahm)
 
 ## License
 
