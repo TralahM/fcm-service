@@ -25,11 +25,11 @@ A professional Rust library for sending Firebase Cloud Messaging (FCM) notificat
 
 To use `fcm-service`, add the following to your `Cargo.toml`:
 
-Current release: v0.2.3
+Current release: v0.2.5
 
 ```toml
 [dependencies]
-fcm-service = { git = "https://github.com/tralahm/fcm-service", tag = "v0.2.3" }
+fcm-service = { git = "https://github.com/tralahm/fcm-service", tag = "v0.2.5" }
 ```
 
 ## Usage
