@@ -28,6 +28,6 @@ jobs:
         run: |
           cargo doc
           pip install ghp-import
-          echo '<meta http-equiv=refresh content=0;url=fcm_service/index.html
+          echo '<meta http-equiv=refresh content=0;url=fcm_service/index.html' > target/doc/index.html
           ghp-import -n target/doc
           git push -qf https://github.com/tralahm/fcm-service.git gh-pages
