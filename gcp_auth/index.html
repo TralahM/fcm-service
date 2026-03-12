@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="GCP auth provides authentication using service accounts Google Cloud Platform (GCP)"><title>gcp_auth - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="gcp_auth" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../static.files/storage-e2aeef58.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate gcp_auth</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../gcp_auth/index.html">gcp_<wbr>auth</a><span class="version">0.12.6</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#simple-usage" title="Simple usage">Simple usage</a></li><li><a href="#supplying-service-account-credentials" title="Supplying service account credentials">Supplying service account credentials</a></li><li><a href="#getting-tokens-in-multi-thread-or-async-environments" title="Getting tokens in multi-thread or async environments">Getting tokens in multi-thread or async environments</a></li></ul><h3><a href="#structs">Crate Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>gcp_<wbr>auth</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/gcp_auth/lib.rs.html#1-207">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>GCP auth provides authentication using service accounts Google Cloud Platform (GCP)</p>
+<p>GCP auth is a simple, minimal authentication library for Google Cloud Platform (GCP)
+providing authentication using service accounts. Once authenticated, the service
+account can be used to acquire bearer tokens for use in authenticating against GCP
+services.</p>
+<p>The library supports the following methods of retrieving tokens:</p>
+<ol>
+<li>Reading custom service account credentials from the path pointed to by the
+<code>GOOGLE_APPLICATION_CREDENTIALS</code> environment variable. Alternatively, custom service
+account credentials can be read from a JSON file or string.</li>
+<li>Look for credentials in <code>.config/gcloud/application_default_credentials.json</code>;
+if found, use these credentials to request refresh tokens. This file can be created
+by invoking <code>gcloud auth application-default login</code>.</li>
+<li>Use the default service account by retrieving a token from the metadata server.</li>
+<li>Retrieving a token from the <code>gcloud</code> CLI tool, if it is available on the <code>PATH</code>.</li>
+</ol>
+<p>For more details, see <a href="fn.provider.html" title="fn gcp_auth::provider"><code>provider()</code></a>.</p>
+<p>A <a href="trait.TokenProvider.html" title="trait gcp_auth::TokenProvider"><code>TokenProvider</code></a> handles caching tokens for their lifetime; it will not make a request if
+an appropriate token is already cached. Therefore, the caller should not cache tokens.</p>
+<h3 id="simple-usage"><a class="doc-anchor" href="#simple-usage">§</a>Simple usage</h3>
+<p>The default way to use this library is to select the appropriate token provider using
+<a href="fn.provider.html" title="fn gcp_auth::provider"><code>provider()</code></a>. It will find the appropriate authentication method and use it to retrieve
+tokens.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>provider = gcp_auth::provider().<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let </span>scopes = <span class="kw-2">&amp;</span>[<span class="string">"https://www.googleapis.com/auth/cloud-platform"</span>];
+<span class="kw">let </span>token = provider.token(scopes).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div><h3 id="supplying-service-account-credentials"><a class="doc-anchor" href="#supplying-service-account-credentials">§</a>Supplying service account credentials</h3>
+<p>When running outside of GCP (for example, on a development machine), it can be useful to supply
+service account credentials. The first method checked by <a href="fn.provider.html" title="fn gcp_auth::provider"><code>provider()</code></a> is to
+read a path to a file containing JSON credentials in the <code>GOOGLE_APPLICATION_CREDENTIALS</code>
+environment variable. However, you may also supply a custom path to read credentials from, or
+a <code>&amp;str</code> containing the credentials. In both of these cases, you should create a
+<a href="struct.CustomServiceAccount.html" title="struct gcp_auth::CustomServiceAccount"><code>CustomServiceAccount</code></a> directly using one of its associated functions:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>gcp_auth::{CustomServiceAccount, TokenProvider};
+
+<span class="comment">// `credentials_path` variable is the path for the credentials `.json` file.
+</span><span class="kw">let </span>credentials_path = PathBuf::from(<span class="string">"service-account.json"</span>);
+<span class="kw">let </span>service_account = CustomServiceAccount::from_file(credentials_path)<span class="question-mark">?</span>;
+<span class="kw">let </span>scopes = <span class="kw-2">&amp;</span>[<span class="string">"https://www.googleapis.com/auth/cloud-platform"</span>];
+<span class="kw">let </span>token = service_account.token(scopes).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div><h3 id="getting-tokens-in-multi-thread-or-async-environments"><a class="doc-anchor" href="#getting-tokens-in-multi-thread-or-async-environments">§</a>Getting tokens in multi-thread or async environments</h3>
+<p>Using a <code>OnceCell</code> makes it easy to reuse the [<code>AuthenticationManager</code>] across different
+threads or async tasks.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>tokio::sync::OnceCell;
+<span class="kw">use </span>gcp_auth::TokenProvider;
+
+<span class="kw">static </span>TOKEN_PROVIDER: OnceCell&lt;Arc&lt;<span class="kw">dyn </span>TokenProvider&gt;&gt; = OnceCell::const_new();
+
+<span class="kw">async fn </span>token_provider() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Arc&lt;<span class="kw">dyn </span>TokenProvider&gt; {
+    TOKEN_PROVIDER
+        .get_or_init(|| <span class="kw">async </span>{
+            gcp_auth::provider()
+                .<span class="kw">await
+                </span>.expect(<span class="string">"unable to initialize token provider"</span>)
+        })
+        .<span class="kw">await
+</span>}</code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.ConfigDefaultCredentials.html" title="struct gcp_auth::ConfigDefaultCredentials">Config<wbr>Default<wbr>Credentials</a></dt><dd>A token provider that uses the default user credentials</dd><dt><a class="struct" href="struct.CustomServiceAccount.html" title="struct gcp_auth::CustomServiceAccount">Custom<wbr>Service<wbr>Account</a></dt><dd>A custom service account containing credentials</dd><dt><a class="struct" href="struct.GCloudAuthorizedUser.html" title="struct gcp_auth::GCloudAuthorizedUser">GCloud<wbr>Authorized<wbr>User</a></dt><dd>A token provider that queries the <code>gcloud</code> CLI for access tokens</dd><dt><a class="struct" href="struct.MetadataServiceAccount.html" title="struct gcp_auth::MetadataServiceAccount">Metadata<wbr>Service<wbr>Account</a></dt><dd>A token provider that queries the GCP instance metadata server for access tokens</dd><dt><a class="struct" href="struct.Signer.html" title="struct gcp_auth::Signer">Signer</a></dt><dd>An RSA PKCS1 SHA256 signer</dd><dt><a class="struct" href="struct.Token.html" title="struct gcp_auth::Token">Token</a></dt><dd>Represents an access token that can be used as a bearer token in HTTP requests</dd></dl><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><dl class="item-table"><dt><a class="enum" href="enum.Error.html" title="enum gcp_auth::Error">Error</a></dt><dd>Enumerates all possible errors returned by this library.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.TokenProvider.html" title="trait gcp_auth::TokenProvider">Token<wbr>Provider</a></dt><dd>A trait for an authentication context that can provide tokens</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.provider.html" title="fn gcp_auth::provider">provider</a></dt><dd>Finds a service account provider to get authentication tokens from</dd></dl></section></div></main></body></html>

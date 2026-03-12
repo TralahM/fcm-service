@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error"],"fn":["provider"],"struct":["ConfigDefaultCredentials","CustomServiceAccount","GCloudAuthorizedUser","MetadataServiceAccount","Signer","Token"],"trait":["TokenProvider"]};

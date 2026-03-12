@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NotificationPriority","Priority","Proxy","Target","Visibility"],"struct":["AndroidConfig","AndroidNotification","ApnsConfig","Color","FcmMessage","FcmNotification","FcmOptions","FcmPayload","FcmService","LightSettings","WebpushConfig"]};
