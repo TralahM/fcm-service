@@ -108,8 +108,6 @@ impl FcmService {
 mod tests {
     use std::{fs::File, io::Write};
 
-    use tempfile;
-
     use super::*;
 
     fn setup_dummy_credentials(temp_dir: &tempfile::TempDir) -> String {
