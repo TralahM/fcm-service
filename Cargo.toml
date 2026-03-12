@@ -4,13 +4,21 @@ version = "0.2.3"
 edition = "2021"
 description = "A Rust library for sending Firebase Cloud Messaging (FCM) notifications"
 license = "MIT"
-repository = "https://github.com/real-ali/fcm-service"
+repository = "https://github.com/tralahm/fcm-service"
 documentation = "https://docs.rs/fcm-service"
 keywords = ["fcm", "firebase", "notifications", "push"]
 categories = ["api-bindings", "network-programming"]
 
 [dependencies]
-reqwest = { version = "^0", features = ["json"] }
+reqwest = { version = "0.12", default-features = false, features = [
+  "json",
+  "rustls-tls-webpki-roots",
+  "charset",
+  "zstd",
+  "http2",
+  "system-proxy",
+] }
+
 serde = { version = "^1", features = ["derive"] }
 serde_json = "^1"
 tokio = { version = "^1", features = ["macros"] }
