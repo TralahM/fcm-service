@@ -1,22 +1,100 @@
-name: Rust
+name: Rust CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [dev]
   pull_request:
-    branches: [ "dev" ]
+    branches: [dev]
 
 env:
   CARGO_TERM_COLOR: always
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-
+  fmt:
+    name: Rustfmt
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Run cargo fmt
+        run: |
+          cargo fmt --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Run cargo clippy
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+
+  test-gnu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta, nightly]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: cargo generate-lockfile
+        if: hashFiles('**/Cargo.lock') == ''
+        run: |
+          cargo generate-lockfile
+
+      - name: Build (default features)
+        run: cargo build --locked --verbose
+
+      - name: Test (default features)
+        run: cargo test --locked --no-fail-fast --verbose
+
+  test-musl:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta, nightly]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install musl-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Install Rust toolchain with musl target
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          targets: x86_64-unknown-linux-musl
+
+      - name: cargo generate-lockfile
+        if: hashFiles('**/Cargo.lock') == ''
+        run: |
+          cargo generate-lockfile
+
+      - name: Build (musl, default features)
+        env:
+          CC: musl-gcc
+          CC_x86_64_unknown_linux_musl: musl-gcc
+        run: cargo build --target x86_64-unknown-linux-musl --locked --verbose
+
+      - name: Test (musl, default features)
+        env:
+          CC: musl-gcc
+          CC_x86_64_unknown_linux_musl: musl-gcc
+        run: cargo test --target x86_64-unknown-linux-musl --locked --no-fail-fast --verbose
